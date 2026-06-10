@@ -62,7 +62,7 @@ export async function updateSession(request: NextRequest) {
         const role = await getAdminRole(user.id);
         if (role === "admin") {
           const redirectUrl = request.nextUrl.clone();
-          redirectUrl.pathname = "/admin/bookings";
+          redirectUrl.pathname = "/admin";
           return NextResponse.redirect(redirectUrl);
         }
       }
@@ -70,18 +70,21 @@ export async function updateSession(request: NextRequest) {
     }
 
     if (isAdminRoot) {
-      const redirectUrl = request.nextUrl.clone();
       if (!user) {
+        const redirectUrl = request.nextUrl.clone();
         redirectUrl.pathname = "/admin/login";
         return NextResponse.redirect(redirectUrl);
       }
 
       const role = await getAdminRole(user.id);
-      redirectUrl.pathname = role === "admin" ? "/admin/bookings" : "/admin/login";
       if (role !== "admin") {
+        const redirectUrl = request.nextUrl.clone();
+        redirectUrl.pathname = "/admin/login";
         redirectUrl.searchParams.set("error", "unauthorized");
+        return NextResponse.redirect(redirectUrl);
       }
-      return NextResponse.redirect(redirectUrl);
+
+      return supabaseResponse;
     }
 
     if (!user) {

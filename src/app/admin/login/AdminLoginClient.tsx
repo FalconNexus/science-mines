@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
+import { adminLogin } from "@/lib/actions/admin-auth";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 
@@ -13,12 +13,20 @@ function getInitialError(param: string | null) {
   return "";
 }
 
-export default function AdminLoginPage() {
+interface AdminLoginPageProps {
+  supabaseConfigured: boolean;
+}
+
+export default function AdminLoginPage({ supabaseConfigured }: AdminLoginPageProps) {
   const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(getInitialError(searchParams.get("error")));
+  const [error, setError] = useState(
+    supabaseConfigured
+      ? getInitialError(searchParams.get("error"))
+      : "Supabase is not configured on the server. Add environment variables and redeploy."
+  );
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -28,40 +36,15 @@ export default function AdminLoginPage() {
     let redirecting = false;
 
     try {
-      const supabase = createClient();
+      const result = await adminLogin(email, password);
 
-      const { data, error: authError } = await supabase.auth.signInWithPassword({
-        email: email.trim(),
-        password,
-      });
-
-      if (authError) {
-        setError(authError.message);
+      if (result.error) {
+        setError(result.error);
         return;
       }
 
-      if (!data.session) {
-        setError("Login succeeded but no session was created. Please try again.");
-        return;
-      }
-
-      const { data: profile, error: profileError } = await supabase
-        .from("profiles")
-        .select("role")
-        .eq("id", data.user.id)
-        .single();
-
-      if (profileError || profile?.role !== "admin") {
-        await supabase.auth.signOut();
-        setError(
-          "This account is not an admin. Run npm run setup:admin or contact the site owner."
-        );
-        return;
-      }
-
-      // Full page navigation avoids router.push hanging when middleware redirects.
       redirecting = true;
-      window.location.assign("/admin/bookings");
+      window.location.assign("/admin");
     } catch (err) {
       setError(
         err instanceof Error
@@ -107,7 +90,11 @@ export default function AdminLoginPage() {
           {error && (
             <p className="text-red-400 text-sm leading-relaxed">{error}</p>
           )}
-          <Button type="submit" disabled={loading} className="w-full">
+          <Button
+            type="submit"
+            disabled={loading || !supabaseConfigured}
+            className="w-full"
+          >
             {loading ? "Signing in..." : "Sign In"}
           </Button>
         </form>

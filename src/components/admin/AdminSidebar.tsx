@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
+  LayoutDashboard,
   Calendar,
   BookOpen,
   Package,
@@ -13,10 +14,11 @@ import {
   Palette,
 } from "lucide-react";
 import { BrandLogo } from "@/components/brand/BrandLogo";
-import { createClient } from "@/lib/supabase/client";
+import { adminLogout } from "@/lib/actions/admin-auth";
 import { cn } from "@/lib/utils";
 
 const NAV = [
+  { href: "/admin", label: "Overview", icon: LayoutDashboard },
   { href: "/admin/bookings", label: "Bookings", icon: Calendar },
   { href: "/admin/courses", label: "Courses", icon: BookOpen },
   { href: "/admin/products", label: "Products", icon: Package },
@@ -33,21 +35,23 @@ export function AdminSidebar({ logoUrl }: AdminSidebarProps) {
   const pathname = usePathname();
 
   async function handleLogout() {
-    const supabase = createClient();
-    await supabase.auth.signOut();
+    await adminLogout();
     window.location.href = "/admin/login";
   }
 
   return (
     <aside className="fixed left-0 top-0 bottom-0 w-64 bg-surface border-r border-border flex flex-col z-40">
       <div className="p-6 border-b border-border">
-        <BrandLogo logoUrl={logoUrl} size="sm" href="/admin/bookings" />
+        <BrandLogo logoUrl={logoUrl} size="sm" href="/admin" />
         <p className="text-xs text-muted mt-2">Admin Dashboard</p>
       </div>
 
       <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
         {NAV.map((item) => {
-          const active = pathname.startsWith(item.href);
+          const active =
+            item.href === "/admin"
+              ? pathname === "/admin"
+              : pathname.startsWith(item.href);
           const Icon = item.icon;
 
           return (
