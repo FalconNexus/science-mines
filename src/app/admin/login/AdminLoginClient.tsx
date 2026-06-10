@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
@@ -14,7 +14,6 @@ function getInitialError(param: string | null) {
 }
 
 export default function AdminLoginPage() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -26,20 +25,52 @@ export default function AdminLoginPage() {
     setLoading(true);
     setError("");
 
-    const supabase = createClient();
-    const { error: authError } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    let redirecting = false;
 
-    if (authError) {
-      setError(authError.message);
-      setLoading(false);
-      return;
+    try {
+      const supabase = createClient();
+
+      const { data, error: authError } = await supabase.auth.signInWithPassword({
+        email: email.trim(),
+        password,
+      });
+
+      if (authError) {
+        setError(authError.message);
+        return;
+      }
+
+      if (!data.session) {
+        setError("Login succeeded but no session was created. Please try again.");
+        return;
+      }
+
+      const { data: profile, error: profileError } = await supabase
+        .from("profiles")
+        .select("role")
+        .eq("id", data.user.id)
+        .single();
+
+      if (profileError || profile?.role !== "admin") {
+        await supabase.auth.signOut();
+        setError(
+          "This account is not an admin. Run npm run setup:admin or contact the site owner."
+        );
+        return;
+      }
+
+      // Full page navigation avoids router.push hanging when middleware redirects.
+      redirecting = true;
+      window.location.assign("/admin/bookings");
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Sign in failed. Check your connection and try again."
+      );
+    } finally {
+      if (!redirecting) setLoading(false);
     }
-
-    router.push("/admin");
-    router.refresh();
   }
 
   return (

@@ -52,16 +52,36 @@ export async function updateSession(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   if (request.nextUrl.pathname.startsWith("/admin")) {
-    if (request.nextUrl.pathname === "/admin/login") {
+    const isLoginPage = request.nextUrl.pathname === "/admin/login";
+    const isAdminRoot =
+      request.nextUrl.pathname === "/admin" ||
+      request.nextUrl.pathname === "/admin/";
+
+    if (isLoginPage) {
       if (user) {
         const role = await getAdminRole(user.id);
         if (role === "admin") {
           const redirectUrl = request.nextUrl.clone();
-          redirectUrl.pathname = "/admin";
+          redirectUrl.pathname = "/admin/bookings";
           return NextResponse.redirect(redirectUrl);
         }
       }
       return supabaseResponse;
+    }
+
+    if (isAdminRoot) {
+      const redirectUrl = request.nextUrl.clone();
+      if (!user) {
+        redirectUrl.pathname = "/admin/login";
+        return NextResponse.redirect(redirectUrl);
+      }
+
+      const role = await getAdminRole(user.id);
+      redirectUrl.pathname = role === "admin" ? "/admin/bookings" : "/admin/login";
+      if (role !== "admin") {
+        redirectUrl.searchParams.set("error", "unauthorized");
+      }
+      return NextResponse.redirect(redirectUrl);
     }
 
     if (!user) {
