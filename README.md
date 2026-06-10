@@ -1,36 +1,74 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ScienceMines
+
+Premium Innovation Lab website with booking system and admin dashboard.
+
+## Tech Stack
+
+- **Frontend:** Next.js 16, TypeScript, Tailwind CSS, GSAP, Framer Motion, Lenis
+- **Backend:** Supabase (PostgreSQL, Auth, Storage)
+- **Deployment:** Vercel
 
 ## Getting Started
 
-First, run the development server:
+### 1. Install dependencies
+
+```bash
+npm install
+```
+
+### 2. Set up Supabase
+
+1. Create a project at [supabase.com](https://supabase.com)
+2. Run the migration in `supabase/migrations/001_initial_schema.sql` via the SQL Editor
+3. Create storage buckets: `course-images`, `product-images`, `gallery-images`, `print-files` (all public)
+4. Copy `.env.local.example` to `.env.local` and fill in your keys
+
+### 3. Create admin user
+
+1. Create a user in Supabase Auth (Authentication → Users)
+2. Insert an admin profile:
+
+```sql
+INSERT INTO profiles (id, email, role)
+VALUES ('YOUR_USER_UUID', 'admin@sciencemines.com', 'admin');
+```
+
+### 4. Run development server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Pages
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Route | Description |
+|-------|-------------|
+| `/` | Homepage — cinematic storytelling with 7 sections |
+| `/booking` | Courses, demo, 3D printing, lab access, products |
+| `/about` | Mission, vision, philosophy, timeline |
+| `/admin` | Dashboard with analytics and management |
+| `/admin/login` | Admin authentication |
 
-## Learn More
+## Brand Colors
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- Primary Orange: `#FF7A00`
+- Secondary Yellow: `#FFC61A`
+- Background: `#000000`
+- Surface: `#0A0A0A`
 
 ## Deploy on Vercel
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+1. Push to GitHub
+2. Import project in Vercel
+3. Add environment variables from `.env.local.example`
+4. Deploy
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Logo
+
+Replace the placeholder "S" logo in `Navbar.tsx`, `Footer.tsx`, and admin components with your ScienceMines logo asset.
+
+## Hero Video
+
+Add your hero video as `public/hero-video.mp4` for the homepage background.
