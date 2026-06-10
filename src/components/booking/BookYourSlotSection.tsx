@@ -7,7 +7,7 @@ import { BookingPromoSection } from "@/components/booking/BookingPromoSection";
 import { SlotPicker } from "@/components/booking/SlotPicker";
 import { getMinBookingDate, formatSlotRange } from "@/lib/slots";
 
-export function DemoClassSection() {
+export function BookYourSlotSection() {
   const [date, setDate] = useState(getMinBookingDate());
   const [slotHour, setSlotHour] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
@@ -32,11 +32,11 @@ export function DemoClassSection() {
         body: JSON.stringify({
           booking_date: date,
           slot_hour: slotHour,
-          booking_type: "demo",
+          booking_type: "workshop",
           name: formData.get("name"),
           phone: formData.get("phone"),
           email: formData.get("email"),
-          course_interested: formData.get("course_interested"),
+          course_interested: formData.get("purpose"),
         }),
       });
 
@@ -54,23 +54,24 @@ export function DemoClassSection() {
 
   return (
     <BookingPromoSection
-      id="demo"
-      label="Free Demo"
-      title="Book a Free Demo Class"
-      subtitle="Try robotics, AI, or 3D printing in our lab — pick a slot and visit us at zero cost."
-      badge="100% Free · Limited Slots"
+      id="slots"
+      variant="black"
+      label="Hands-On Workshop"
+      title="Book a Lab Workshop"
+      subtitle="Reserve your 1-hour slot and build something real — robots, circuits, 3D prints, and more."
+      badge="Most Popular · 11 AM – 7 PM"
       perks={[
-        "Hands-on lab experience",
-        "Meet our mentors",
-        "Explore courses",
-        "No commitment",
+        "1-hour dedicated lab time",
+        "Expert mentor support",
+        "Use pro tools & kits",
+        "Take your project home",
       ]}
     >
       {success ? (
         <div className="text-center py-8">
-          <p className="text-primary font-semibold text-lg mb-2">Demo Booked!</p>
+          <p className="text-primary font-semibold text-lg mb-2">Workshop Booked!</p>
           <p className="text-muted text-sm">
-            We&apos;ll see you at the lab for your free session.
+            We&apos;ll confirm your session and get you building soon.
           </p>
           <Button variant="outline" className="mt-6" onClick={() => setSuccess(false)}>
             Book Another
@@ -98,14 +99,15 @@ export function DemoClassSection() {
           <Input name="phone" label="Phone" required />
           <Input name="email" label="Email" type="email" required />
           <Input
-            name="course_interested"
-            label="Course Interested In"
+            name="purpose"
+            label="What do you want to build?"
             required
-            placeholder="e.g. Robotics, AI, 3D Printing"
+            placeholder="e.g. Robot arm, IoT project, 3D design"
           />
+
           {error && <p className="text-red-400 text-sm">{error}</p>}
           <Button type="submit" disabled={loading || slotHour === null} className="w-full">
-            {loading ? "Submitting…" : "Book Free Demo Class"}
+            {loading ? "Booking…" : "Book Workshop Slot"}
           </Button>
         </form>
       )}

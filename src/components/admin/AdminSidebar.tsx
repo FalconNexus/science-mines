@@ -11,7 +11,9 @@ import {
   MessageSquare,
   LogOut,
   ExternalLink,
+  Palette,
 } from "lucide-react";
+import { BrandLogo } from "@/components/brand/BrandLogo";
 import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
 
@@ -21,10 +23,15 @@ const NAV = [
   { href: "/admin/courses", label: "Courses", icon: BookOpen },
   { href: "/admin/products", label: "Products", icon: Package },
   { href: "/admin/gallery", label: "Lab Gallery", icon: Image },
+  { href: "/admin/branding", label: "Branding", icon: Palette },
   { href: "/admin/contacts", label: "Contacts", icon: MessageSquare },
 ];
 
-export function AdminSidebar() {
+interface AdminSidebarProps {
+  logoUrl?: string | null;
+}
+
+export function AdminSidebar({ logoUrl }: AdminSidebarProps) {
   const pathname = usePathname();
 
   async function handleLogout() {
@@ -36,18 +43,11 @@ export function AdminSidebar() {
   return (
     <aside className="fixed left-0 top-0 bottom-0 w-64 bg-surface border-r border-border flex flex-col z-40">
       <div className="p-6 border-b border-border">
-        <Link href="/admin" className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-lg bg-primary flex items-center justify-center font-display font-bold text-black">
-            S
-          </div>
-          <div>
-            <p className="font-display font-bold text-sm">ScienceMines</p>
-            <p className="text-xs text-muted">Admin Dashboard</p>
-          </div>
-        </Link>
+        <BrandLogo logoUrl={logoUrl} size="sm" href="/admin" />
+        <p className="text-xs text-muted mt-2">Admin Dashboard</p>
       </div>
 
-      <nav className="flex-1 p-4 space-y-1">
+      <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
         {NAV.map((item) => {
           const active =
             item.href === "/admin"

@@ -107,6 +107,30 @@ export interface AnalyticsEvent {
   created_at: string;
 }
 
+export interface SiteSettings {
+  id: number;
+  logo_url: string | null;
+  favicon_url: string | null;
+  updated_at: string;
+}
+
+export type SlotBookingType = "demo" | "workshop" | "course";
+
+export interface SlotBooking {
+  id: string;
+  booking_date: string;
+  slot_hour: number;
+  booking_type: SlotBookingType;
+  course_id: string | null;
+  course_title: string | null;
+  course_interested: string | null;
+  name: string;
+  phone: string;
+  email: string;
+  status: BookingStatus;
+  created_at: string;
+}
+
 export interface DashboardStats {
   totalVisits: number;
   uniqueVisitors: number;

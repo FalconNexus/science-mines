@@ -4,10 +4,15 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
-import { NAV_LINKS, PAGE_LINKS, SITE } from "@/lib/constants";
+import { BrandLogo } from "@/components/brand/BrandLogo";
+import { NAV_LINKS, PAGE_LINKS } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 
-export function Navbar() {
+interface NavbarProps {
+  logoUrl?: string | null;
+}
+
+export function Navbar({ logoUrl }: NavbarProps) {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -36,15 +41,7 @@ export function Navbar() {
         )}
       >
         <div className="container-wide flex items-center justify-between px-6">
-          <Link href="/" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center font-display font-bold text-black text-sm group-hover:scale-105 transition-transform">
-              SM
-            </div>
-            <span className="font-display text-xl font-bold tracking-tight">
-              <span className="text-foreground">{SITE.brandScience}</span>
-              <span className="text-primary">{SITE.brandMines}</span>
-            </span>
-          </Link>
+          <BrandLogo logoUrl={logoUrl} size="md" />
 
           <nav className="hidden lg:flex items-center gap-6">
             {NAV_LINKS.map((link) => (

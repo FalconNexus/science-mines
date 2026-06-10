@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { CourseBookingSection } from "@/components/booking/CourseBookingSection";
 import { DemoClassSection } from "@/components/booking/DemoClassSection";
+import { BookYourSlotSection } from "@/components/booking/BookYourSlotSection";
 import { PrintRequestSection } from "@/components/booking/PrintRequestSection";
 import { LabAccessSection } from "@/components/booking/LabAccessSection";
 import { ProductsSection } from "@/components/booking/ProductsSection";
@@ -29,16 +30,17 @@ export default async function BookingPage() {
             Start Building
           </h1>
           <p className="text-muted max-w-2xl mx-auto text-lg">
-            Book courses, request 3D printing, reserve lab access, or order
-            components — all in one place.
+            Start with a free demo or book a hands-on workshop — then explore
+            courses, 3D printing, lab access, and products.
           </p>
         </div>
       </div>
 
       <BookingNav />
 
-      <CourseBookingSection courses={courses} />
       <DemoClassSection />
+      <BookYourSlotSection />
+      <CourseBookingSection courses={courses} />
       <PrintRequestSection />
       <LabAccessSection />
       <ProductsSection products={products} />

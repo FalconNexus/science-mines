@@ -1,8 +1,9 @@
 "use client";
 
 const SECTIONS = [
-  { id: "courses", label: "Courses" },
   { id: "demo", label: "Free Demo" },
+  { id: "slots", label: "Workshop" },
+  { id: "courses", label: "Courses" },
   { id: "print", label: "3D Printing" },
   { id: "lab", label: "Lab Access" },
   { id: "products", label: "Products" },

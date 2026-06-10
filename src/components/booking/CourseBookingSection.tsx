@@ -5,7 +5,9 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
+import { SlotPicker } from "@/components/booking/SlotPicker";
 import { formatPrice } from "@/lib/utils";
+import { getMinBookingDate, formatSlotRange } from "@/lib/slots";
 import type { Course } from "@/types/database";
 
 interface CourseBookingSectionProps {
@@ -14,6 +16,8 @@ interface CourseBookingSectionProps {
 
 export function CourseBookingSection({ courses }: CourseBookingSectionProps) {
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
+  const [date, setDate] = useState(getMinBookingDate());
+  const [slotHour, setSlotHour] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
@@ -21,16 +25,23 @@ export function CourseBookingSection({ courses }: CourseBookingSectionProps) {
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (!selectedCourse) return;
+    if (slotHour === null) {
+      setError("Please select a time slot.");
+      return;
+    }
 
     setLoading(true);
     setError("");
     const formData = new FormData(e.currentTarget);
 
     try {
-      const res = await fetch("/api/bookings/course", {
+      const res = await fetch("/api/bookings/slot", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          booking_date: date,
+          slot_hour: slotHour,
+          booking_type: "course",
           course_id: selectedCourse.id,
           course_title: selectedCourse.title,
           name: formData.get("name"),
@@ -39,12 +50,14 @@ export function CourseBookingSection({ courses }: CourseBookingSectionProps) {
         }),
       });
 
-      if (!res.ok) throw new Error("Failed");
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Booking failed");
       setSuccess(true);
       setSelectedCourse(null);
+      setSlotHour(null);
       e.currentTarget.reset();
-    } catch {
-      setError("Booking failed. Please try again.");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Booking failed. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -83,6 +96,7 @@ export function CourseBookingSection({ courses }: CourseBookingSectionProps) {
                 onClick={() => {
                   setSelectedCourse(course);
                   setSuccess(false);
+                  setSlotHour(null);
                 }}
               >
                 <div className="relative aspect-video bg-surface">
@@ -142,12 +156,32 @@ export function CourseBookingSection({ courses }: CourseBookingSectionProps) {
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-4">
+                <SlotPicker
+                  date={date}
+                  onDateChange={(d) => {
+                    setDate(d);
+                    setSlotHour(null);
+                  }}
+                  selectedHour={slotHour}
+                  onSelectHour={setSlotHour}
+                />
+
+                {slotHour !== null && (
+                  <p className="text-sm text-primary">
+                    Selected: {date} · {formatSlotRange(slotHour)}
+                  </p>
+                )}
+
                 <Input name="name" label="Name" required />
                 <Input name="phone" label="Phone" required />
                 <Input name="email" label="Email" type="email" required />
                 {error && <p className="text-red-400 text-sm">{error}</p>}
-                <Button type="submit" disabled={loading} className="w-full">
-                  {loading ? "Submitting..." : "Book Course"}
+                <Button
+                  type="submit"
+                  disabled={loading || slotHour === null}
+                  className="w-full"
+                >
+                  {loading ? "Submitting…" : "Book Course"}
                 </Button>
               </form>
             )}

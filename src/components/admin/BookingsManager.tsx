@@ -3,11 +3,13 @@
 import { updateBookingStatus } from "@/lib/actions/admin";
 import { AdminTable, StatusSelect } from "@/components/admin/AdminTable";
 import { formatDateTime } from "@/lib/utils";
+import { formatSlotRange } from "@/lib/slots";
 import type {
   CourseBooking,
   DemoBooking,
   LabBooking,
   PrintRequest,
+  SlotBooking,
   BookingStatus,
 } from "@/types/database";
 
@@ -22,13 +24,36 @@ type BookingRow = {
   table: string;
 };
 
+const SLOT_TYPE_LABELS: Record<string, string> = {
+  demo: "Demo Slot",
+  workshop: "Workshop Slot",
+  course: "Course Slot",
+};
+
 function mapBookings(
   course: CourseBooking[],
   demo: DemoBooking[],
   lab: LabBooking[],
-  print: PrintRequest[]
+  print: PrintRequest[],
+  slots: SlotBooking[]
 ): BookingRow[] {
   const rows: BookingRow[] = [
+    ...slots.map((b) => ({
+      id: b.id,
+      type: SLOT_TYPE_LABELS[b.booking_type] ?? "Slot",
+      name: b.name,
+      contact: `${b.phone} · ${b.email}`,
+      details: [
+        b.booking_date,
+        formatSlotRange(b.slot_hour),
+        b.course_title || b.course_interested,
+      ]
+        .filter(Boolean)
+        .join(" · "),
+      status: b.status,
+      created_at: b.created_at,
+      table: "slot_bookings",
+    })),
     ...course.map((b) => ({
       id: b.id,
       type: "Course",
@@ -81,6 +106,7 @@ interface BookingsManagerProps {
   demoBookings: DemoBooking[];
   labBookings: LabBooking[];
   printRequests: PrintRequest[];
+  slotBookings: SlotBooking[];
 }
 
 export function BookingsManager({
@@ -88,12 +114,14 @@ export function BookingsManager({
   demoBookings,
   labBookings,
   printRequests,
+  slotBookings,
 }: BookingsManagerProps) {
   const rows = mapBookings(
     courseBookings,
     demoBookings,
     labBookings,
-    printRequests
+    printRequests,
+    slotBookings
   );
 
   async function handleStatusChange(

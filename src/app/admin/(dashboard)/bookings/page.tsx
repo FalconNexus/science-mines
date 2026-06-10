@@ -3,16 +3,18 @@ import {
   getAllDemoBookings,
   getAllLabBookings,
   getAllPrintRequests,
+  getAllSlotBookings,
 } from "@/lib/data";
 import { BookingsManager } from "@/components/admin/BookingsManager";
 
 export default async function AdminBookingsPage() {
-  const [courseBookings, demoBookings, labBookings, printRequests] =
+  const [courseBookings, demoBookings, labBookings, printRequests, slotBookings] =
     await Promise.all([
       getAllCourseBookings(),
       getAllDemoBookings(),
       getAllLabBookings(),
       getAllPrintRequests(),
+      getAllSlotBookings(),
     ]);
 
   return (
@@ -28,6 +30,7 @@ export default async function AdminBookingsPage() {
         demoBookings={demoBookings}
         labBookings={labBookings}
         printRequests={printRequests}
+        slotBookings={slotBookings}
       />
     </div>
   );

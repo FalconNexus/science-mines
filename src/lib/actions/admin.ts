@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { isMissingTableError, saveBrandingToStorage } from "@/lib/branding";
 import type { BookingStatus, ProductCategory } from "@/types/database";
 
 async function requireAdmin() {
@@ -196,4 +197,33 @@ export async function updateContactStatus(id: string, status: BookingStatus) {
     .eq("id", id);
   if (error) throw new Error(error.message);
   revalidatePath("/admin/contacts");
+}
+
+export async function updateBranding(formData: FormData) {
+  const supabase = await requireAdmin();
+
+  const payload = {
+    logo_url: (formData.get("logo_url") as string) || null,
+    favicon_url: (formData.get("favicon_url") as string) || null,
+  };
+
+  const { error } = await supabase.from("site_settings").upsert({
+    id: 1,
+    ...payload,
+    updated_at: new Date().toISOString(),
+  });
+
+  if (error) {
+    if (isMissingTableError(error.message)) {
+      await saveBrandingToStorage(payload);
+    } else {
+      throw new Error(error.message);
+    }
+  }
+
+  revalidatePath("/");
+  revalidatePath("/about");
+  revalidatePath("/booking");
+  revalidatePath("/admin/branding");
+  revalidatePath("/admin", "layout");
 }

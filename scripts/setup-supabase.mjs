@@ -17,6 +17,7 @@ const BUCKETS = [
   { id: "product-images", public: true },
   { id: "gallery-images", public: true },
   { id: "print-files", public: true },
+  { id: "branding", public: true },
 ];
 
 async function createBucket(id, isPublic) {
@@ -75,6 +76,7 @@ async function main() {
     "contact_requests",
     "course_bookings",
     "profiles",
+    "site_settings",
   ];
 
   let allExist = true;

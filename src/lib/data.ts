@@ -1,8 +1,14 @@
 import { createClient } from "@/lib/supabase/server";
+import {
+  DEFAULT_SITE_SETTINGS,
+  getBrandingFromStorage,
+  isMissingTableError,
+} from "@/lib/branding";
 import type {
   Course,
   Product,
   GalleryImage,
+  SiteSettings,
   DashboardStats,
   AnalyticsEvent,
   CourseBooking,
@@ -10,7 +16,34 @@ import type {
   LabBooking,
   PrintRequest,
   ContactRequest,
+  SlotBooking,
 } from "@/types/database";
+
+export async function getSiteSettings(): Promise<SiteSettings> {
+  const supabase = await createClient();
+  if (!supabase) {
+    return (await getBrandingFromStorage()) ?? DEFAULT_SITE_SETTINGS;
+  }
+
+  const { data, error } = await supabase
+    .from("site_settings")
+    .select("*")
+    .eq("id", 1)
+    .single();
+
+  if (error) {
+    if (isMissingTableError(error.message)) {
+      return (await getBrandingFromStorage()) ?? DEFAULT_SITE_SETTINGS;
+    }
+    return DEFAULT_SITE_SETTINGS;
+  }
+
+  if (!data) {
+    return (await getBrandingFromStorage()) ?? DEFAULT_SITE_SETTINGS;
+  }
+
+  return data;
+}
 
 export async function getCourses(): Promise<Course[]> {
   const supabase = await createClient();
@@ -177,6 +210,17 @@ export async function getAllPrintRequests(): Promise<PrintRequest[]> {
     .from("print_requests")
     .select("*")
     .order("created_at", { ascending: false });
+  return data ?? [];
+}
+
+export async function getAllSlotBookings(): Promise<SlotBooking[]> {
+  const supabase = await createClient();
+  if (!supabase) return [];
+  const { data, error } = await supabase
+    .from("slot_bookings")
+    .select("*")
+    .order("created_at", { ascending: false });
+  if (error) return [];
   return data ?? [];
 }
 

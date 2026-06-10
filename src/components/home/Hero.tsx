@@ -5,6 +5,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { gsap } from "gsap";
 import { ArrowRight, MapPin, Sparkles } from "lucide-react";
+import { HeroBackground } from "@/components/home/HeroBackground";
 import { HERO_STATS, SITE } from "@/lib/constants";
 
 export function Hero() {
@@ -26,17 +27,7 @@ export function Hero() {
 
   return (
     <section className="relative min-h-screen flex flex-col justify-center overflow-hidden">
-      <div className="absolute inset-0 bg-black">
-        <div
-          className="absolute inset-0 bg-cover bg-center opacity-30"
-          style={{
-            backgroundImage:
-              "url('https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=1920&q=80')",
-          }}
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/80 to-black" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(255,122,0,0.15)_0%,transparent_65%)]" />
-      </div>
+      <HeroBackground />
 
       <div
         ref={contentRef}
@@ -63,7 +54,7 @@ export function Hero() {
         <div className="hero-fade flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
           <Link
             href="/booking"
-            className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-primary text-black font-semibold hover:bg-secondary transition-all"
+            className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-primary text-black font-semibold hover:bg-secondary transition-all shadow-[0_0_40px_rgba(255,122,0,0.25)]"
           >
             Book a Workshop
             <ArrowRight size={18} />
@@ -93,7 +84,7 @@ export function Hero() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.8 + i * 0.1 }}
-              className="text-center p-4 rounded-2xl border border-border bg-surface/50 backdrop-blur-sm"
+              className="text-center p-4 rounded-2xl border border-border bg-black/40 backdrop-blur-sm"
             >
               <p className="font-display text-2xl md:text-3xl font-bold gradient-text">
                 {stat.value}

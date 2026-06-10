@@ -1,21 +1,20 @@
 import Link from "next/link";
+import { BrandLogo } from "@/components/brand/BrandLogo";
 import { NAV_LINKS, PAGE_LINKS, SITE } from "@/lib/constants";
 import { generateWhatsAppContactUrl } from "@/lib/whatsapp";
 
-export function Footer() {
+interface FooterProps {
+  logoUrl?: string | null;
+}
+
+export function Footer({ logoUrl }: FooterProps) {
   return (
     <footer className="border-t border-border bg-surface">
       <div className="container-wide px-6 py-16">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
           <div className="md:col-span-2">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center font-display font-bold text-black text-sm">
-                SM
-              </div>
-              <span className="font-display text-xl font-bold">
-                <span>{SITE.brandScience}</span>
-                <span className="text-primary">{SITE.brandMines}</span>
-              </span>
+            <div className="mb-4">
+              <BrandLogo logoUrl={logoUrl} size="md" href="/" />
             </div>
             <p className="text-muted max-w-md leading-relaxed mb-4">
               {SITE.description}
@@ -75,14 +74,6 @@ export function Footer() {
                 >
                   WhatsApp
                 </a>
-              </li>
-              <li>
-                <Link
-                  href="/admin/login"
-                  className="hover:text-foreground transition-colors"
-                >
-                  Admin
-                </Link>
               </li>
             </ul>
           </div>
